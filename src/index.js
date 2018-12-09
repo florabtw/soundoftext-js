@@ -27,8 +27,8 @@ const configure = ({api}) => {
   client = protocol == 'https' ? https : http;
 };
 
-const request = (options, body) => {
-  return new Promise((resolve, reject) => {
+const request = (options, body) =>
+  new Promise((resolve, reject) => {
     const request = client.request(options, res => {
       let data = '';
       res.on('data', chunk => (data = data + chunk));
@@ -39,37 +39,27 @@ const request = (options, body) => {
     request.on('error', reject);
     request.end();
   });
-};
-
-const operations = {
-  request: ({text, voice}) =>
-    request(options.request(), bodies.request(text, voice)),
-  status: ({id}) => request(options.status(id)),
-};
 
 const retry = (func, timeout) =>
   new Promise(resolve => setTimeout(() => resolve(func()), timeout));
 
-const location = ({id, timeout = 1000}) => {
-  return operations.status({id}).then(res => {
+const location = ({id, timeout = 1000}) =>
+  operations.status({id}).then(res => {
     if (res.status == 'Error') throw res.message;
     if (res.status == 'Done') return res.location;
     if (timeout > 30 * 1000) throw 'Operation timed out';
 
     return retry(() => location({id, timeout: timeout * 2}), timeout);
   });
+
+const create = request => operations.request(request).then(operations.location);
+
+const operations = {
+  create,
+  location,
+  request: ({text, voice}) =>
+    request(options.request(), bodies.request(text, voice)),
+  status: ({id}) => request(options.status(id)),
 };
 
-const create = request => operations.request(request).then(location);
-
-const soundoftext = {
-  configure,
-  sounds: {
-    create: create,
-    location,
-    request: operations.request,
-    status: operations.status,
-  },
-};
-
-module.exports = soundoftext;
+module.exports = {configure, sounds: operations};
