@@ -9,7 +9,7 @@ let options = {
     hostname: 'api.soundoftext.com',
   },
   create: () => ({...options.default, method: 'POST', path: '/sounds'}),
-  show: id => ({...options.default, method: 'GET', path: `/sounds/${id}`}),
+  status: id => ({...options.default, method: 'GET', path: `/sounds/${id}`}),
 };
 
 const bodies = {
@@ -41,7 +41,7 @@ const request = (options, body) => {
 const operations = {
   create: ({text, voice}) =>
     request(options.create(), bodies.create(text, voice)),
-  show: id => request(options.show(id)),
+  status: ({id}) => request(options.status(id)),
 };
 
 const retry = (func, timeout) => {
@@ -51,7 +51,7 @@ const retry = (func, timeout) => {
 };
 
 const location = (soundId, timeout = 1000) => {
-  return operations.show(soundId).then(res => {
+  return operations.status({id: soundId}).then(res => {
     if (res.status == 'Error') throw res.message;
     if (timeout > 30 * 1000) throw 'Operation timed out';
     if (res.status == 'Pending') {
@@ -66,7 +66,7 @@ const soundoftext = {
   configure,
   sounds: {
     create: operations.create,
-    show: operations.show,
+    status: operations.status,
     location: location,
   },
 };
