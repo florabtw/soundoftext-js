@@ -5,7 +5,10 @@ let client = https;
 
 let options = {
   default: {
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'SoundOfTextClient',
+    },
     hostname: 'api.soundoftext.com',
   },
   request: () => ({...options.default, method: 'POST', path: '/sounds'}),

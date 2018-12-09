@@ -9,11 +9,16 @@ const bodies = {
     JSON.stringify({engine, data: {text, voice}}),
 };
 
+const headers = {
+  'Content-Type': 'application/json',
+  'User-Agent': 'SoundOfTextClient',
+};
+
 const mockRequest = (text, voice, url = 'https://api.soundoftext.com') => {
   const expectedBody = bodies.request(text, voice);
   const mockResponse = {success: true, id: 1};
 
-  nock(url)
+  nock(url, {reqheaders: headers})
     .post('/sounds', expectedBody)
     .reply(200, mockResponse);
 
@@ -23,7 +28,7 @@ const mockRequest = (text, voice, url = 'https://api.soundoftext.com') => {
 const mockStatus = id => {
   const mockResponse = {status: 'DONE', location: 'fakelocation'};
 
-  nock('https://api.soundoftext.com')
+  nock('https://api.soundoftext.com', {reqheaders: headers})
     .get(`/sounds/${id}`)
     .reply(200, mockResponse);
 
@@ -31,7 +36,7 @@ const mockStatus = id => {
 };
 
 const mockLocation = id => {
-  nock('https://api.soundoftext.com')
+  nock('https://api.soundoftext.com', {reqheaders: headers})
     .get(`/sounds/${id}`)
     .reply(200, {status: 'Pending'})
     .get(`/sounds/${id}`)
