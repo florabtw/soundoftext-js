@@ -1,0 +1,14 @@
+{
+  "author": "Nick Pierson",
+  "description": "NodeJS client for SoundOfText API",
+  "devDependencies": {
+    "ava": "1.0.0-rc.2"
+  },
+  "license": "MIT",
+  "main": "src/index.js",
+  "name": "soundoftext-js",
+  "scripts": {
+    "test": "ava"
+  },
+  "version": "1.0.0"
+}
