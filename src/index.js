@@ -41,12 +41,6 @@ const request = (options, body) => {
   });
 };
 
-const operations = {
-  request: ({text, voice}) =>
-    request(options.request(), bodies.request(text, voice)),
-  status: ({id}) => request(options.status(id)),
-};
-
 const retry = (func, timeout) =>
   new Promise(resolve => setTimeout(() => resolve(func()), timeout));
 
@@ -60,16 +54,14 @@ const location = ({id, timeout = 1000}) => {
   });
 };
 
-const create = request => operations.request(request).then(location);
+const create = request => operations.request(request).then(operations.location);
 
-const soundoftext = {
-  configure,
-  sounds: {
-    create: create,
-    location,
-    request: operations.request,
-    status: operations.status,
-  },
+const operations = {
+  create,
+  location,
+  request: ({text, voice}) =>
+    request(options.request(), bodies.request(text, voice)),
+  status: ({id}) => request(options.status(id)),
 };
 
-module.exports = soundoftext;
+module.exports = {configure, sounds: operations};
