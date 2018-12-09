@@ -1,11 +1,13 @@
-const http = require('https');
+const http = require('http');
+const https = require('https');
 
-const options = {
+let client = https;
+
+let options = {
   default: {
     headers: {'Content-Type': 'application/json'},
     hostname: 'api.soundoftext.com',
   },
-
   create: () => ({...options.default, method: 'POST', path: '/sounds'}),
   show: id => ({...options.default, method: 'GET', path: `/sounds/${id}`}),
 };
@@ -15,9 +17,16 @@ const bodies = {
     JSON.stringify({engine, data: {text, voice}}),
 };
 
+const configure = ({api}) => {
+  const [protocol, hostname] = api.split('://');
+
+  options = {...options, default: {...options.default, hostname}};
+  client = protocol == 'https' ? https : http;
+};
+
 const request = (options, body) => {
   return new Promise((resolve, reject) => {
-    const request = http.request(options, res => {
+    const request = client.request(options, res => {
       let data = '';
       res.on('data', chunk => (data = data + chunk));
       res.on('end', () => resolve(JSON.parse(data)));
@@ -53,10 +62,13 @@ const location = (soundId, timeout = 1000) => {
   });
 };
 
-module.exports = {
+const soundoftext = {
+  configure,
   sounds: {
     create: operations.create,
     show: operations.show,
     location: location,
   },
 };
+
+module.exports = soundoftext;
