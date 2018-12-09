@@ -44,21 +44,16 @@ const operations = {
   status: ({id}) => request(options.status(id)),
 };
 
-const retry = (func, timeout) => {
-  return new Promise(resolve => {
-    setTimeout(() => resolve(func()), timeout);
-  });
-};
+const retry = (func, timeout) =>
+  new Promise(resolve => setTimeout(() => resolve(func()), timeout));
 
 const location = ({id, timeout = 1000}) => {
   return operations.status({id}).then(res => {
     if (res.status == 'Error') throw res.message;
+    if (res.status == 'Done') return res.location;
     if (timeout > 30 * 1000) throw 'Operation timed out';
-    if (res.status == 'Pending') {
-      return retry(() => location({id, timeout: timeout * 2}), timeout);
-    }
 
-    return res.location;
+    return retry(() => location({id, timeout: timeout * 2}), timeout);
   });
 };
 
