@@ -60,12 +60,15 @@ const location = ({id, timeout = 1000}) => {
   });
 };
 
+const create = request => operations.request(request).then(location);
+
 const soundoftext = {
   configure,
   sounds: {
+    create: create,
+    location,
     request: operations.request,
     status: operations.status,
-    location,
   },
 };
 

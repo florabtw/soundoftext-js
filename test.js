@@ -26,7 +26,7 @@ const mockRequest = (text, voice, url = 'https://api.soundoftext.com') => {
 };
 
 const mockStatus = id => {
-  const mockResponse = {status: 'DONE', location: 'fakelocation'};
+  const mockResponse = {status: 'DONE', location: 'location'};
 
   nock('https://api.soundoftext.com', {reqheaders: headers})
     .get(`/sounds/${id}`)
@@ -45,44 +45,62 @@ const mockLocation = id => {
   return 'location';
 };
 
+const mockCreate = (text, voice) => {
+  nock('https://api.soundoftext.com', {reqheaders: headers})
+    .post('/sounds')
+    .reply(200, {id: 2})
+    .get(`/sounds/2`)
+    .reply(200, {status: 'Done', location: 'location'});
+
+  return 'location';
+};
+
 test.beforeEach(() => {
   client.configure({api: 'https://api.soundoftext.com'});
 });
 
 test('can request sounds', async t => {
-  const response = mockRequest('hello', 'en-US');
+  const response = mockRequest('request', 'en-US');
 
-  const body = await sounds.request({text: 'hello', voice: 'en-US'});
+  const body = await sounds.request({text: 'request', voice: 'en-US'});
 
   t.deepEqual(response, body);
 });
 
 test.serial('can configure api host', async t => {
-  const response = mockRequest('hello', 'en-US', 'http://fakeapi.com');
+  const response = mockRequest('request', 'en-US', 'http://fakeapi.com');
 
   client.configure({api: 'http://fakeapi.com'});
 
-  const body = await sounds.request({text: 'hello', voice: 'en-US'});
+  const body = await sounds.request({text: 'request', voice: 'en-US'});
 
   t.deepEqual(response, body);
 });
 
 test('can get sound status', async t => {
-  const requestRes = mockRequest('hello', 'en-US');
+  const requestRes = mockRequest('status', 'en-US');
   const statusRes = mockStatus(requestRes.id);
 
-  await sounds.request({text: 'hello', voice: 'en-US'});
+  await sounds.request({text: 'status', voice: 'en-US'});
   const body = await sounds.status({id: requestRes.id});
 
   t.deepEqual(body, statusRes);
 });
 
 test('can get sound location', async t => {
-  const requestRes = mockRequest('hello', 'en-US');
+  const requestRes = mockRequest('location', 'en-US');
   const locationRes = mockLocation(requestRes.id);
 
-  await sounds.request({text: 'hello', voice: 'en-US'});
+  await sounds.request({text: 'location', voice: 'en-US'});
   const body = await sounds.location({id: requestRes.id});
 
   t.is(locationRes, body);
+});
+
+test('can create sound', async t => {
+  const response = mockCreate('create', 'en-US');
+
+  const body = await sounds.create({text: 'create', voice: 'en-US'});
+
+  t.is(response, body);
 });
