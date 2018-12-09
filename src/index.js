@@ -50,12 +50,12 @@ const retry = (func, timeout) => {
   });
 };
 
-const location = (soundId, timeout = 1000) => {
-  return operations.status({id: soundId}).then(res => {
+const location = ({id, timeout = 1000}) => {
+  return operations.status({id}).then(res => {
     if (res.status == 'Error') throw res.message;
     if (timeout > 30 * 1000) throw 'Operation timed out';
     if (res.status == 'Pending') {
-      return retry(() => location(soundId, timeout * 2), timeout);
+      return retry(() => location({id, timeout: timeout * 2}), timeout);
     }
 
     return res.location;
@@ -67,7 +67,7 @@ const soundoftext = {
   sounds: {
     create: operations.create,
     status: operations.status,
-    location: location,
+    location,
   },
 };
 

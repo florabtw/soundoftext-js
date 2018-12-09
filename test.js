@@ -30,6 +30,16 @@ const mockStatus = id => {
   return mockResponse;
 };
 
+const mockLocation = id => {
+  nock('https://api.soundoftext.com')
+    .get(`/sounds/${id}`)
+    .reply(200, {status: 'Pending'})
+    .get(`/sounds/${id}`)
+    .reply(200, {status: 'Done', location: 'location'});
+
+  return 'location';
+};
+
 test.beforeEach(() => {
   client.configure({api: 'https://api.soundoftext.com'});
 });
@@ -60,4 +70,14 @@ test('can get sound status', async t => {
   const body = await sounds.status({id: createRes.id});
 
   t.deepEqual(body, statusRes);
+});
+
+test('can get sound location', async t => {
+  const createRes = mockCreate('hello', 'en-US');
+  const locationRes = mockLocation(createRes.id);
+
+  await sounds.create({text: 'hello', voice: 'en-US'});
+  const body = await sounds.location({id: createRes.id});
+
+  t.is(locationRes, body);
 });
