@@ -1,19 +1,18 @@
-const http = require('http');
+const http = require('https');
 
 const options = {
   default: {
-    headers: { 'Content-Type': 'application/json' },
-    hostname: 'localhost',
-    port: 5757
+    headers: {'Content-Type': 'application/json'},
+    hostname: 'api.soundoftext.com',
   },
 
-  create: () => ({ ...options.default, method: 'POST', path: '/sounds' }),
-  show: id => ({ ...options.default, method: 'GET', path: `/sounds/${id}` })
+  create: () => ({...options.default, method: 'POST', path: '/sounds'}),
+  show: id => ({...options.default, method: 'GET', path: `/sounds/${id}`}),
 };
 
 const bodies = {
-  create: (engine = 'Google', text = 'Hello, world!', voice = 'en-US') =>
-    JSON.stringify({ engine, data: { text, voice } })
+  create: (engine = 'Google', text, voice) =>
+    JSON.stringify({engine, data: {text, voice}}),
 };
 
 const request = (options, body) => {
@@ -31,8 +30,9 @@ const request = (options, body) => {
 };
 
 const operations = {
-  create: () => request(options.create(), bodies.create()),
-  show: id => request(options.show(id))
+  create: ({text, voice}) =>
+    request(options.create(), bodies.create(text, voice)),
+  show: id => request(options.show(id)),
 };
 
 const retry = (func, timeout) => {
@@ -54,9 +54,9 @@ const location = (soundId, timeout = 1000) => {
 };
 
 module.exports = {
-  sound: {
+  sounds: {
     create: operations.create,
     show: operations.show,
-    location: location
-  }
+    location: location,
+  },
 };
