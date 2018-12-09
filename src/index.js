@@ -8,12 +8,12 @@ let options = {
     headers: {'Content-Type': 'application/json'},
     hostname: 'api.soundoftext.com',
   },
-  create: () => ({...options.default, method: 'POST', path: '/sounds'}),
+  request: () => ({...options.default, method: 'POST', path: '/sounds'}),
   status: id => ({...options.default, method: 'GET', path: `/sounds/${id}`}),
 };
 
 const bodies = {
-  create: (engine = 'Google', text, voice) =>
+  request: (engine = 'Google', text, voice) =>
     JSON.stringify({engine, data: {text, voice}}),
 };
 
@@ -39,8 +39,8 @@ const request = (options, body) => {
 };
 
 const operations = {
-  create: ({text, voice}) =>
-    request(options.create(), bodies.create(text, voice)),
+  request: ({text, voice}) =>
+    request(options.request(), bodies.request(text, voice)),
   status: ({id}) => request(options.status(id)),
 };
 
@@ -60,7 +60,7 @@ const location = ({id, timeout = 1000}) => {
 const soundoftext = {
   configure,
   sounds: {
-    create: operations.create,
+    request: operations.request,
     status: operations.status,
     location,
   },
