@@ -6,9 +6,11 @@
     "nock": "^10.0.4",
     "prettier": "^1.15.3"
   },
+  "keywords": ["soundoftext", "sound", "of", "text"],
   "license": "MIT",
   "main": "src/index.js",
   "name": "soundoftext-js",
+  "repository": "github:ncpierson/soundoftext-js",
   "scripts": {
     "test": "ava"
   },
