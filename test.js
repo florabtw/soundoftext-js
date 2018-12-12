@@ -5,7 +5,7 @@ const test = require('ava'),
 const sounds = client.sounds;
 
 const bodies = {
-  request: (engine = 'Google', text, voice) =>
+  request: ({engine = 'Google', text, voice}) =>
     JSON.stringify({engine, data: {text, voice}}),
 };
 
@@ -15,7 +15,7 @@ const headers = {
 };
 
 const mockRequest = (text, voice, url = 'https://api.soundoftext.com') => {
-  const expectedBody = bodies.request(text, voice);
+  const expectedBody = bodies.request({text, voice});
   const mockResponse = {success: true, id: 1};
 
   nock(url, {reqheaders: headers})

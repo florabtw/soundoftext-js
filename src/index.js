@@ -16,7 +16,7 @@ let options = {
 };
 
 const bodies = {
-  request: (engine = 'Google', text, voice) =>
+  request: ({engine = 'Google', text, voice}) =>
     JSON.stringify({engine, data: {text, voice}}),
 };
 
@@ -32,7 +32,11 @@ const request = (options, body) =>
     const request = client.request(options, res => {
       let data = '';
       res.on('data', chunk => (data = data + chunk));
-      res.on('end', () => resolve(JSON.parse(data)));
+      res.on('end', () => {
+        const response = JSON.parse(data);
+        if (response.message) reject(response.message);
+        else resolve(response);
+      });
     });
     request.setTimeout(10 * 1000);
     if (body) request.write(body);
@@ -58,7 +62,7 @@ const operations = {
   create,
   location,
   request: ({text, voice}) =>
-    request(options.request(), bodies.request(text, voice)),
+    request(options.request(), bodies.request({text, voice})),
   status: ({id}) => request(options.status(id)),
 };
 
