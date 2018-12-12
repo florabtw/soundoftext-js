@@ -39,7 +39,7 @@ const client = require('soundoftext-js');
 
 client.sounds.create({ text:'Hello, world!', voice: 'en-US' })
   .then(soundUrl => {
-    console.log(soundUrl); // https://soundoftext.nyc3.digitaloceanspaces.com/<sound id>.mp3
+    console.log(soundUrl); // https://soundoftext.nyc3.digitaloceanspaces.com/<sound-id>.mp3
   })
   .catch(e => {
     /* Reasons that the Promise might get rejected:
@@ -66,10 +66,14 @@ const client = require('soundoftext-js');
 
 client.sounds.request({ text: 'Hello, world!', voice: 'en-US' })
   .then(response => {
-    console.log(response); // { id: '<sound id>' }
+    console.log(response);
+    /* One of:
+     * { success: true, id: '<sound-id>' }
+     * { success: false, message: '<error-message>' }
+     */
   })
   .catch(e => {
-     /* Reasons that the Promise might get rejected:
+    /* Reasons that the Promise might get rejected:
      * - API rejects the request
      * - other miscellaneous network issues
      */
@@ -96,9 +100,9 @@ client.sounds.request({ text: 'Hello, world!', voice: 'en-US' })
   .then(status => {
     console.log(status);
     /* One of:
-     * { status: 'Error', message: '<error message>' }
+     * { status: 'Error', message: '<error-message>' }
      * { status: 'Pending' }
-     * { status: 'Done', location: '<url for mp3 file>' }
+     * { status: 'Done', location: '<url-for-mp3-file>' }
      */
   })
   .catch(e => {
@@ -128,7 +132,7 @@ client.sounds.request({ text: 'Hello, world!', voice: 'en-US' })
     return client.sounds.location({ id: response.id });
   })
   .then(location => {
-    console.log(location); // https://soundoftext.nyc3.digitaloceanspaces.com/<sound id>.mp3
+    console.log(location); // https://soundoftext.nyc3.digitaloceanspaces.com/<sound-id>.mp3
   })
   .catch(e => {
     /* Reasons that the Promise might get rejected:
